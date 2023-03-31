@@ -1,0 +1,10 @@
+[dwindle-autogroup]
+description = "Dwindle Autogroup"
+version = "1.0.0"
+author = "ItsDrike"
+
+[diwndle-autogroup.build]
+output = "dwindle-autogroup.so"
+steps = [
+    "make all",
+]
