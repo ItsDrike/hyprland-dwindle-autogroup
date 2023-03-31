@@ -10,6 +10,8 @@ Since Hyprland plugins don't have ABI guarantees, you should download the Hyprla
 
 The guide on compiling and installing Hyprland manually is on the [wiki](http://wiki.hyprland.org/Getting-Started/Installation/#manual-manual-build)
 
+Note, this plugin currently requires hyprland compiled from commit: [`16bc5`](https://github.com/hyprwm/Hyprland/commit/16bc5997bb764a69433def368169a9f41a077dc6) or later.
+
 ## Using [hyprload](https://github.com/Duckonaut/hyprload)
 1. Export the `HYPRLAND_HEADERS` variable to point to the root directory of the Hyprland repo
     - `export HYPRLAND_HEADERS="$HOME/repos/Hyprland"`
