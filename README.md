@@ -2,7 +2,7 @@
 
 This plugin changes the behavior of the `togglegroup` dispatcher for dwindle layout, to automatically group all of the child windows when a new group is created.
 
-Before Hyprland `v0.23.0beta`, this was actually the default behavior, however as that release introduced group support for other layouts, including floating windows, this dwindle specific feature was removed and `togglegroup` now only creates a group window, and requires you to move in all of the windows that should be a part of that group into it manually.
+Before Hyprland `v0.23.0beta`, this was actually the default behavior ([PR #1580](https://github.com/hyprwm/Hyprland/pull/1580)), however as that release introduced group support for other layouts, including floating windows, this dwindle specific feature was removed and `togglegroup` now only creates a group window, and requires you to move in all of the windows that should be a part of that group into it manually.
 
 ## Installation
 
