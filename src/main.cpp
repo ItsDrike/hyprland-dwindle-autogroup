@@ -101,12 +101,26 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
     static const auto METHODS = HyprlandAPI::findFunctionsByName(PHANDLE, "getNodeFromWindow");
     g_pNodeFromWindow = (nodeFromWindowT)METHODS[1].address;
 
-    originalToggleGroup = g_pKeybindManager->m_mDispatchers["togglegroup"];
-    HyprlandAPI::addDispatcher(PHANDLE, "togglegroup", toggleGroup);
+    for (auto& method : METHODS) {
+        if (method.demangled == "CHyprDwindleLayout::getNodeFromWindow(CWindow*)") {
+            g_pNodeFromWindow = (nodeFromWindowT)method.address;
+            break;
+        }
+    }
 
-    HyprlandAPI::reloadConfig();
+    if (g_pNodeFromWindow == nullptr) {
+        Debug::log(ERR, "getNodeFromWindow funnction for dwindle layout wasn't found! This function's signature probably changed, report this");
+        HyprlandAPI::addNotification(
+            PHANDLE, "[dwindle-autogroup] Initialization failed!! getNodeFromWindow functio not found", s_pluginColor, 10000);
+    }
+    else {
+        originalToggleGroup = g_pKeybindManager->m_mDispatchers["togglegroup"];
+        HyprlandAPI::addDispatcher(PHANDLE, "togglegroup", toggleGroup);
 
-    HyprlandAPI::addNotification(PHANDLE, "[dwindle-autogroup] Initialized successfully!", s_pluginColor, 5000);
+        HyprlandAPI::reloadConfig();
+
+        HyprlandAPI::addNotification(PHANDLE, "[dwindle-autogroup] Initialized successfully!", s_pluginColor, 5000);
+    }
 
     return {"dwindle-autogroup", "Dwindle Autogroup", "ItsDrike", "1.0"};
 }
