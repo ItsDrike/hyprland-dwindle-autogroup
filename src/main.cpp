@@ -97,9 +97,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 {
     PHANDLE = handle;
 
-    // Get address of the private CHyprDwindleLayout::getNodeFromWindow, we'll need it in toggleGroup
-    g_pNodeFromWindow =
-        (nodeFromWindowT)HyprlandAPI::getFunctionAddressFromSignature(PHANDLE, "_ZN18CHyprDwindleLayout17getNodeFromWindowEP7CWindow");
+    // Get address of the private CHyprDwindleLayout::getNodeFromWindow member function, we'll need it in toggleGroup
+    static const auto METHODS = HyprlandAPI::findFunctionsByName(PHANDLE, "getNodeFromWindow");
+    g_pNodeFromWindow = (nodeFromWindowT)METHODS[0].address;
 
     originalToggleGroup = g_pKeybindManager->m_mDispatchers["togglegroup"];
     HyprlandAPI::addDispatcher(PHANDLE, "togglegroup", toggleGroup);
