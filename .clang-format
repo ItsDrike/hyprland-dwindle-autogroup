@@ -3,12 +3,13 @@ BreakBeforeBraces: Stroustrup
 TabWidth: 4
 IndentWidth: 4
 UseTab: Never
-AllowShortIfStatementsOnASingleLine: false
 IndentCaseLabels: true
-ColumnLimit: 200
+ColumnLimit: 150
 PointerAlignment: Left
 AllowShortBlocksOnASingleLine: Empty
 AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: false
