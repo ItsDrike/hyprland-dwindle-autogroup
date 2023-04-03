@@ -26,45 +26,42 @@ void addChildNodesToDequeRecursive(std::deque<SDwindleNodeData*>* pDeque, std::d
     }
 }
 
-void toggleGroup(std::string args)
+void groupDissolve(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
 {
-    // Run the original function, creating the group
-    originalToggleGroup(args);
+    CWindow* PWINDOW = PNODE->pWindow;
 
-    // We only care about group creations, not group disolves
-    const auto PWINDOW = g_pCompositor->m_pLastWindow;
-
-    if (!PWINDOW || !g_pCompositor->windowValidMapped(PWINDOW))
-        return;
-
-    if (!PWINDOW->m_sGroupData.pNextWindow) {
-        Debug::log(LOG, "Ignoring autogroup for group disolve");
+    // This group only has this single winodw
+    if (PWINDOW->m_sGroupData.pNextWindow == PWINDOW) {
+        Debug::log(LOG, "Ignoring autogroup on single window dissolve");
+        originalToggleGroup("");
         return;
     }
 
-    // Don't do anything if we're not on "dwindle" layout
-    IHyprLayout* layout = g_pLayoutManager->getCurrentLayout();
-    if (layout->getLayoutName() != "dwindle") {
-        return;
-    }
-    CHyprDwindleLayout* cur_dwindle = (CHyprDwindleLayout*)layout;
+    Debug::log(LOG, "Dissolving group");
+    // We currently don't need any special logic for dissolving, just call the original func
+    originalToggleGroup("");
+}
 
-    const auto PNODE = g_pNodeFromWindow(cur_dwindle, PWINDOW);
-    if (!PNODE) {
-        Debug::log(LOG, "Ignoring autogroup for floating window");
-        return;
-    }
+void groupCreate(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
+{
+    const auto PWINDOW = PNODE->pWindow;
 
     const auto PWORKSPACE = g_pCompositor->getWorkspaceByID(PNODE->workspaceID);
     if (PWORKSPACE->m_bHasFullscreenWindow) {
-        Debug::log(ERR, "Ignoring autogroupgroup on a fullscreen window");
+        Debug::log(LOG, "Ignoring autogroup on a fullscreen window");
+        originalToggleGroup("");
         return;
     }
 
     if (!PNODE->pParent) {
         Debug::log(LOG, "Ignoring autogroup for a solitary window");
+        originalToggleGroup("");
         return;
     }
+
+    Debug::log(LOG, "Creating group");
+    // Call the original toggleGroup function, and only do extra things afterwards
+    originalToggleGroup("");
 
     std::deque<SDwindleNodeData*> newGroupMembers;
     std::deque<SDwindleNodeData*> parentNodes;
@@ -72,6 +69,7 @@ void toggleGroup(std::string args)
     addChildNodesToDequeRecursive(
         &newGroupMembers, &parentNodes, PNODE->pParent->children[0] == PNODE ? PNODE->pParent->children[1] : PNODE->pParent->children[0]);
 
+    // Make sure one of the child nodes isn't itself a group
     for (auto& n : newGroupMembers) {
         if (n->pWindow->m_sGroupData.pNextWindow) {
             Debug::log(LOG, "Ignoring autogroup for nested groups");
@@ -86,6 +84,37 @@ void toggleGroup(std::string args)
         PWINDOW->insertWindowToGroup(window);
         window->m_dWindowDecorations.emplace_back(std::make_unique<CHyprGroupBarDecoration>(window));
         PWINDOW->setGroupCurrent(PWINDOW);
+    }
+}
+
+void toggleGroup(std::string args)
+{
+    // We only care about group creations, not group disolves
+    const auto PWINDOW = g_pCompositor->m_pLastWindow;
+    if (!PWINDOW || !g_pCompositor->windowValidMapped(PWINDOW))
+        return;
+
+    // Don't do anything if we're not on "dwindle" layout
+    IHyprLayout* layout = g_pLayoutManager->getCurrentLayout();
+    if (layout->getLayoutName() != "dwindle") {
+        Debug::log(LOG, "Ignoring autogroup for non-dinwle layout");
+        originalToggleGroup(args);
+        return;
+    }
+
+    CHyprDwindleLayout* cur_dwindle = (CHyprDwindleLayout*)layout;
+
+    const auto PNODE = g_pNodeFromWindow(cur_dwindle, PWINDOW);
+    if (!PNODE) {
+        Debug::log(LOG, "Ignoring autogroup for floating window");
+        originalToggleGroup(args);
+        return;
+    }
+
+    if (PWINDOW->m_sGroupData.pNextWindow) {
+        groupDissolve(PNODE, cur_dwindle);
+    } else {
+        groupCreate(PNODE, cur_dwindle);
     }
 }
 
