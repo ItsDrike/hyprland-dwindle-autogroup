@@ -14,12 +14,11 @@ inline std::function<void(std::string)> originalToggleGroup = nullptr;
 typedef SDwindleNodeData* (*nodeFromWindowT)(void*, CWindow*);
 inline nodeFromWindowT g_pNodeFromWindow = nullptr;
 
-void addChildNodesToDequeRecursive(std::deque<SDwindleNodeData*>* pDeque, std::deque<SDwindleNodeData*>* pParents, SDwindleNodeData* node)
+void addChildNodesToDequeRecursive(std::deque<SDwindleNodeData*>* pDeque, SDwindleNodeData* node)
 {
     if (node->isNode) {
-        pParents->push_back(node);
-        addChildNodesToDequeRecursive(pDeque, pParents, node->children[0]);
-        addChildNodesToDequeRecursive(pDeque, pParents, node->children[1]);
+        addChildNodesToDequeRecursive(pDeque, node->children[0]);
+        addChildNodesToDequeRecursive(pDeque, node->children[1]);
     }
     else {
         pDeque->emplace_back(node);
@@ -64,10 +63,8 @@ void groupCreate(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
     originalToggleGroup("");
 
     std::deque<SDwindleNodeData*> newGroupMembers;
-    std::deque<SDwindleNodeData*> parentNodes;
 
-    addChildNodesToDequeRecursive(
-        &newGroupMembers, &parentNodes, PNODE->pParent->children[0] == PNODE ? PNODE->pParent->children[1] : PNODE->pParent->children[0]);
+    addChildNodesToDequeRecursive(&newGroupMembers, PNODE->pParent->children[0] == PNODE ? PNODE->pParent->children[1] : PNODE->pParent->children[0]);
 
     // Make sure one of the child nodes isn't itself a group
     for (auto& n : newGroupMembers) {
