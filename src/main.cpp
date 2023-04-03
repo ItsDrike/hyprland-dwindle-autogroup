@@ -113,7 +113,8 @@ void toggleGroup(std::string args)
 
     if (PWINDOW->m_sGroupData.pNextWindow) {
         groupDissolve(PNODE, cur_dwindle);
-    } else {
+    }
+    else {
         groupCreate(PNODE, cur_dwindle);
     }
 }
