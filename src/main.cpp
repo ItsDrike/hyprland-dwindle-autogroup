@@ -63,6 +63,7 @@ void toggleGroup(std::string args)
 
     if (!PNODE->pParent) {
         Debug::log(LOG, "Ignoring autogroup for a solitary window");
+        return;
     }
 
     std::deque<SDwindleNodeData*> newGroupMembers;
@@ -74,6 +75,7 @@ void toggleGroup(std::string args)
     for (auto& n : newGroupMembers) {
         if (n->pWindow->m_sGroupData.pNextWindow) {
             Debug::log(LOG, "Ignoring autogroup for nested groups");
+            return;
         }
     }
 
