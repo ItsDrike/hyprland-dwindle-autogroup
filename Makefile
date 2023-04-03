@@ -19,7 +19,7 @@ ifndef HYPRLAND_HEADERS
 endif
 
 $(PLUGIN_NAME).so: $(SOURCE_FILES) $(INCLUDE_FILES)
-	g++ -shared -fPIC --no-gnu-unique $(SOURCE_FILES) -o $(PLUGIN_NAME).so -g -I "/usr/include/pixman-1" -I "/usr/include/libdrm" -I "${HYPRLAND_HEADERS}" -Iinclude -std=c++23
+	g++ -shared -fPIC --no-gnu-unique $(SOURCE_FILES) -o $(PLUGIN_NAME).so -g -I "/usr/include/pixman-1" -I "/usr/include/libdrm" -I "${HYPRLAND_HEADERS}" -I "${HYPRLAND_HEADERS}/subprojects/wlroots/include" -I "${HYPRLAND_HEADERS}/subprojects/wlroots/build/include" -Iinclude -std=c++23
 
 clean:
 	rm ./${PLUGIN_NAME}.so
