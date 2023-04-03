@@ -83,8 +83,11 @@ void groupCreate(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
         layout->onWindowRemoved(window);
         PWINDOW->insertWindowToGroup(window);
         window->m_dWindowDecorations.emplace_back(std::make_unique<CHyprGroupBarDecoration>(window));
-        PWINDOW->setGroupCurrent(PWINDOW);
     }
+
+    // Moving new windows into group makes them the active window in that group,
+    // refocus the original window
+    PWINDOW->setGroupCurrent(PWINDOW);
 }
 
 void toggleGroup(std::string args)
