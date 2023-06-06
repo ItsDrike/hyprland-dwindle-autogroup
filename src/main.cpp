@@ -1,5 +1,3 @@
-#define WLR_USE_UNSTABLE
-
 #include "globals.hpp"
 
 #include <hyprland/src/Window.hpp>
