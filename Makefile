@@ -4,6 +4,8 @@
 
 PLUGIN_NAME=dwindle-autogroup
 
+INSTALL_LOCATION=${HOME}/.local/share/hyprload/plugins/bin
+
 SOURCE_FILES=$(wildcard src/*.cpp)
 
 COMPILE_FLAGS=-g -fPIC --no-gnu-unique -std=c++23
@@ -17,7 +19,8 @@ LINK_FLAGS=-shared
 all: check_env $(PLUGIN_NAME).so
 
 install: all
-	cp $(PLUGIN_NAME).so ${HOME}/.local/share/hyprload/plugins/bin
+	mkdir -p $(INSTALL_LOCATION)
+	cp $(PLUGIN_NAME).so $(INSTALL_LOCATION)
 
 check_env:
 	@if ! pkg-config --exists hyprland; then \
