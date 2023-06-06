@@ -10,22 +10,35 @@ Since Hyprland plugins don't have ABI guarantees, you should download the Hyprla
 
 The guide on compiling and installing Hyprland manually is on the [wiki](http://wiki.hyprland.org/Getting-Started/Installation/#manual-manual-build)
 
-Note, this plugin currently requires hyprland compiled from commit: [`16bc5`](https://github.com/hyprwm/Hyprland/commit/16bc5997bb764a69433def368169a9f41a077dc6) or later.
+Note, this plugin currently requires hyprland compiled from commit: [`4afeedbd`](https://github.com/hyprwm/Hyprland/commit/4afeedbd567ca2114f682f14a6de26d4a8188878) or later.
 
 ## Using [hyprload](https://github.com/Duckonaut/hyprload)
-1. Export the `HYPRLAND_HEADERS` variable to point to the root directory of the Hyprland repo
-    - `export HYPRLAND_HEADERS="$HOME/repos/Hyprland"`
-2. Install
-    - `make install`
+
+Add the line `"ItsDrike/hyprland-dwindle-autogroup"` to your `hyprload.toml` config, like this:
+
+```
+plugins = [
+    "ItsDrike/hyprland-dwindle-autogroup",
+]
+```
+
+Then update via `hyprload,update` dispatcher.
 
 ## Manual installation
-1. Export the `HYPRLAND_HEADERS` variable to point to the root directory of the Hyprland repo
-    - `export HYPRLAND_HEADERS="$HOME/repos/Hyprland"`
-2. Compile
-    - `make all`
-3. Add this line to the bottom of your hyprland config
-    - `exec-once=hyprctl plugin load <ABSOLUTE PATH TO split-monitor-workspaces.so>`
 
+1. Clone the Hyprland repository and build the plugin environment
+
+   - `git clone --recursive https://github.com/hyprwm/Hyprland`
+   - In the Hyprland directory: `make pluginenv`
+   - Ideally, you should use this instance of Hyprland as your compositor, to do that, run `make install`. This is heavily recommended, as using a different Hyprland instance might cause incompatibilities.
+
+2. Build the plugn
+
+   - Run `make all`
+
+3. Add this line to the bottom of your hyprland config
+
+   - `exec-once=hyprctl plugin load <ABSOLUTE PATH TO split-monitor-workspaces.so>`
 
 ## Development
 
