@@ -13,6 +13,8 @@ COMPILE_FLAGS+=-Iinclude
 
 LINK_FLAGS=-shared
 
+# Phony targets (i.e. targets that don't actually build anything, and don't track dependencies)
+# These will always be run when called
 .PHONY: clean clangd
 
 all: check_env $(PLUGIN_NAME).so
