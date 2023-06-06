@@ -14,15 +14,16 @@ install: all
 	cp $(PLUGIN_NAME).so ${HOME}/.local/share/hyprload/plugins/bin
 
 check_env:
-ifndef HYPRLAND_HEADERS
-	$(error HYPRLAND_HEADERS is undefined! Please set it to the path to the root of the configured Hyprland repo)
-endif
+	@if ! pkg-config --exists hyprland; then \
+		echo 'Hyprland headers not available. Run `make pluginenv` in the root Hyprland directory.'; \
+		exit 1; \
+	fi
 
 $(PLUGIN_NAME).so: $(SOURCE_FILES) $(INCLUDE_FILES)
-	g++ -shared -fPIC --no-gnu-unique $(SOURCE_FILES) -o $(PLUGIN_NAME).so -g -I "/usr/include/pixman-1" -I "/usr/include/libdrm" -I "${HYPRLAND_HEADERS}" -I "${HYPRLAND_HEADERS}/subprojects/wlroots/include" -I "${HYPRLAND_HEADERS}/subprojects/wlroots/build/include" -Iinclude -std=c++23
+	g++ -shared -fPIC --no-gnu-unique $(SOURCE_FILES) -o $(PLUGIN_NAME).so -g `pkg-config --cflags pixman-1 libdrm hyprland` -Iinclude -std=c++23
 
 clean:
 	rm ./${PLUGIN_NAME}.so
 
 clangd:
-	printf "%b" "-I/usr/include/pixman-1\n-I/usr/include/libdrm\n-I${HYPRLAND_HEADERS}\n-Iinclude\n-std=c++2b" > compile_flags.txt
+	printf "%b" "`pkg-config --cflags pixman-1 libdrm hyprland | sed 's/ -/\n-/g'`\n-Iinclude\n-std=c++2b" > compile_flags.txt
