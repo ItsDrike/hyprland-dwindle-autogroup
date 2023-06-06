@@ -6,6 +6,12 @@ PLUGIN_NAME=dwindle-autogroup
 
 SOURCE_FILES=$(wildcard src/*.cpp)
 
+COMPILE_FLAGS=-g -fPIC --no-gnu-unique -std=c++23
+COMPILE_FLAGS+=`pkg-config --cflags pixman-1 libdrm hyprland`
+COMPILE_FLAGS+=-Iinclude
+
+LINK_FLAGS=-shared
+
 .PHONY: clean clangd
 
 all: check_env $(PLUGIN_NAME).so
@@ -20,10 +26,14 @@ check_env:
 	fi
 
 $(PLUGIN_NAME).so: $(SOURCE_FILES) $(INCLUDE_FILES)
-	g++ -shared -fPIC --no-gnu-unique $(SOURCE_FILES) -o $(PLUGIN_NAME).so -g `pkg-config --cflags pixman-1 libdrm hyprland` -Iinclude -std=c++23
+	g++ $(LINK_FLAGS) $(COMPILE_FLAGS) $(SOURCE_FILES) -o $(PLUGIN_NAME).so
 
 clean:
 	rm ./${PLUGIN_NAME}.so
 
 clangd:
-	printf "%b" "`pkg-config --cflags pixman-1 libdrm hyprland | sed 's/ -/\n-/g'`\n-Iinclude\n-std=c++2b" > compile_flags.txt
+	echo "$(COMPILE_FLAGS)" | \
+		sed 's/--no-gnu-unique//g' | \
+		sed 's/ -/\n-/g' | \
+		sed 's/std=c++23/std=c++2b/g' \
+		> compile_flags.txt
