@@ -73,11 +73,29 @@ void groupCreate(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
     }
 
     // Add all of the children nodes into the group
+    // (This is mostly copied logic from CKeybindManager::moveIntoGroup. Note that it
+    // includes support for the child node to be in another group, in which case only
+    // this window if moved out of that group and into this one. We don't actually
+    // need this logic now, because we don't support nested groups though)
     for (auto& n : newGroupMembers) {
         auto window = n->pWindow;
-        layout->onWindowRemoved(window);
+
+        // Create a group bar decoration for the window
+        // (assuming it's not already in a group, in which case it should have one)
+        if (!window->m_sGroupData.pNextWindow)
+            window->m_dWindowDecorations.emplace_back(std::make_unique<CHyprGroupBarDecoration>(window));
+
+        g_pLayoutManager->getCurrentLayout()->onWindowRemoved(window); // This removes groupped property!
+
+        window->m_sGroupData.locked = false;
+        window->m_sGroupData.head = false;
+
         PWINDOW->insertWindowToGroup(window);
-        window->m_dWindowDecorations.emplace_back(std::make_unique<CHyprGroupBarDecoration>(window));
+        PWINDOW->setGroupCurrent(window);
+        window->updateWindowDecos();
+
+        g_pLayoutManager->getCurrentLayout()->recalculateWindow(window);
+        g_pCompositor->focusWindow(window);
     }
 
     // Moving new windows into group makes them the active window in that group,
