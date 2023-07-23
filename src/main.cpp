@@ -23,6 +23,25 @@ void collectChildNodes(std::deque<SDwindleNodeData*>* pDeque, SDwindleNodeData* 
     }
 }
 
+/// This is partially from CKeybindManager::moveIntoGroup (dispatcher) function
+/// but without making the new window focused.
+void moveIntoGroup(CWindow* window, CWindow* groupRootWin)
+{
+    // Remove this window from being shown by layout (it will become a part of a group)
+    g_pLayoutManager->getCurrentLayout()->onWindowRemoved(window);
+
+    // Create a group bar decoration for the window
+    // (if it's not already a group, in which case it should already have it)
+    if (!window->m_sGroupData.pNextWindow)
+        window->m_dWindowDecorations.emplace_back(std::make_unique<CHyprGroupBarDecoration>(window));
+
+    groupRootWin->insertWindowToGroup(window);
+
+    // Make sure to treat this window as hidden (will focus the group instead of this window
+    // on request activate). This is the behavior CWindow::setGroupCurrent uses.
+    window->setHidden(true);
+}
+
 void groupDissolve(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
 {
     CWindow* PWINDOW = PNODE->pWindow;
@@ -61,7 +80,6 @@ void groupCreate(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
     originalToggleGroup("");
 
     std::deque<SDwindleNodeData*> newGroupMembers;
-
     collectChildNodes(&newGroupMembers, PNODE->pParent->children[0] == PNODE ? PNODE->pParent->children[1] : PNODE->pParent->children[0]);
 
     // Make sure one of the child nodes isn't itself a group
@@ -73,24 +91,9 @@ void groupCreate(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
     }
 
     // Add all of the children nodes into the group
-    // This is partially from CKeybindManager::moveIntoGroup (dispatcher) function
-    // but without making the new window focused.
     for (auto& n : newGroupMembers) {
         auto window = n->pWindow;
-
-        // Remove this window from being shown by layout (it will become a part of a group)
-        g_pLayoutManager->getCurrentLayout()->onWindowRemoved(window);
-
-        // Create a group bar decoration for the window
-        // (if it's not already a group, in which case it should already have it)
-        if (!window->m_sGroupData.pNextWindow)
-            window->m_dWindowDecorations.emplace_back(std::make_unique<CHyprGroupBarDecoration>(window));
-
-        PWINDOW->insertWindowToGroup(window);
-
-        // Make sure to treat this window as hidden (will focus the group instead of this window
-        // on request activate). This is the behavior CWindow::setGroupCurrent uses.
-        window->setHidden(true);
+        moveIntoGroup(window, PWINDOW);
     }
 }
 
