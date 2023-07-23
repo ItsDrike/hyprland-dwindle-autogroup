@@ -7,6 +7,8 @@ INSTALL_LOCATION=${HOME}/.local/share/hyprload/plugins/bin
 
 SOURCE_FILES=$(wildcard src/*.cpp)
 
+# Compiler/Linker flags
+
 COMPILE_DEFINES=-DWLR_USE_UNSTABLE
 
 COMPILE_FLAGS=-g -fPIC --no-gnu-unique -std=c++23
@@ -17,22 +19,23 @@ LINK_FLAGS=-shared
 
 # Phony targets (i.e. targets that don't actually build anything, and don't track dependencies)
 # These will always be run when called
-.PHONY: clean clangd
+.PHONY: clean uninstall clangd
 
-all: check_env $(PLUGIN_NAME).so
-
-install: all
-	mkdir -p $(INSTALL_LOCATION)
-	cp $(PLUGIN_NAME).so $(INSTALL_LOCATION)
-
-check_env:
+all:
 	@if ! pkg-config --exists hyprland; then \
 		echo 'Hyprland headers not available. Run `make pluginenv` in the root Hyprland directory.'; \
 		exit 1; \
 	fi
 
-$(PLUGIN_NAME).so: $(SOURCE_FILES) $(INCLUDE_FILES)
 	g++ $(LINK_FLAGS) $(COMPILE_FLAGS) $(COMPILE_DEFINES) $(SOURCE_FILES) -o $(PLUGIN_NAME).so
+
+install: all
+	$(MAKE) clear
+	mkdir -p $(INSTALL_LOCATION)
+	cp $(PLUGIN_NAME).so $(INSTALL_LOCATION)
+
+uninstall:
+	rm -rf $(INSTALL_LOCATION)
 
 clean:
 	rm ./${PLUGIN_NAME}.so
