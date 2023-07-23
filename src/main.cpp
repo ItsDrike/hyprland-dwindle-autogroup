@@ -81,6 +81,11 @@ void groupCreate(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
         // Remove this window from being shown by layout (it will become a part of a group)
         g_pLayoutManager->getCurrentLayout()->onWindowRemoved(window);
 
+        // Create a group bar decoration for the window
+        // (if it's not already a group, in which case it should already have it)
+        if (!window->m_sGroupData.pNextWindow)
+            window->m_dWindowDecorations.emplace_back(std::make_unique<CHyprGroupBarDecoration>(window));
+
         PWINDOW->insertWindowToGroup(window);
 
         // Make sure to treat this window as hidden (will focus the group instead of this window
