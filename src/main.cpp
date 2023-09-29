@@ -4,6 +4,7 @@
 #include <hyprland/src/layout/DwindleLayout.hpp>
 #include <hyprland/src/managers/KeybindManager.hpp>
 #include <hyprland/src/managers/LayoutManager.hpp>
+#include <hyprland/src/render/decorations/CHyprGroupBarDecoration.hpp>
 
 const CColor s_pluginColor = {0x61 / 255.0f, 0xAF / 255.0f, 0xEF / 255.0f, 1.0f};
 
