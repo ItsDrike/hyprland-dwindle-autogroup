@@ -31,7 +31,6 @@ all:
 	g++ $(LINK_FLAGS) $(COMPILE_FLAGS) $(COMPILE_DEFINES) $(SOURCE_FILES) -o $(PLUGIN_NAME).so
 
 install:
-	$(MAKE) clear
 	$(MAKE) all
 	mkdir -p $(INSTALL_LOCATION)
 	cp $(PLUGIN_NAME).so $(INSTALL_LOCATION)
