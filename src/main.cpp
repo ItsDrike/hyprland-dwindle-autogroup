@@ -1,7 +1,9 @@
 #include "globals.hpp"
 
+#include <hyprland/src/Compositor.hpp>
 #include <hyprland/src/Window.hpp>
 #include <hyprland/src/layout/DwindleLayout.hpp>
+#include <hyprland/src/layout/IHyprLayout.hpp>
 #include <hyprland/src/managers/KeybindManager.hpp>
 #include <hyprland/src/managers/LayoutManager.hpp>
 #include <hyprland/src/render/decorations/CHyprGroupBarDecoration.hpp>
@@ -43,6 +45,16 @@ void moveIntoGroup(CWindow* window, CWindow* groupRootWin)
     window->setHidden(true);
 }
 
+void collectGroupWindows(std::deque<CWindow*>* pDeque, CWindow* pWindow)
+{
+    CWindow* curr = pWindow;
+    do {
+        const auto PLAST = curr;
+        pDeque->emplace_back(curr);
+        curr = curr->m_sGroupData.pNextWindow;
+    } while (curr != pWindow);
+}
+
 void groupDissolve(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
 {
     CWindow* PWINDOW = PNODE->pWindow;
@@ -54,9 +66,54 @@ void groupDissolve(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
         return;
     }
 
+    // We could just call originalToggleGroup function here, but that fucntion doesn't
+    // respect the dwindle layout, and would just place the newly ungroupped windows
+    // randomly throughout the worskapce, messing up the layout. So instead, we replicate
+    // it's behavior here manually, taking care to disolve the groups nicely.
     Debug::log(LOG, "Dissolving group");
-    // We currently don't need any special logic for dissolving, just call the original func
-    originalToggleGroup("");
+
+    std::deque<CWindow*> members;
+    collectGroupWindows(&members, PWINDOW);
+
+    // If the group head window is in fullscreen, unfullscreen it.
+    // We need to have the window placed in the layout, to figure out where
+    // to ungroup the rest of the windows.
+    g_pCompositor->setWindowFullscreen(PWINDOW, false, FULLSCREEN_FULL);
+
+    Debug::log(LOG, "Ungroupping Members");
+
+    const bool GROUPSLOCKEDPREV = g_pKeybindManager->m_bGroupsLocked;
+
+    for (auto& w : members) {
+        w->m_sGroupData.pNextWindow = nullptr;
+        w->setHidden(false);
+
+        // Ask layout to create a new window for all windows that were in the group
+        // except for the group head (already has a window).
+        if (w->m_sGroupData.head) {
+            Debug::log(LOG, "Ungroupping member head window");
+            w->m_sGroupData.head = false;
+
+            // Update the window decorations (removing group bar)
+            // w->updateWindowDecos();
+        }
+        else {
+            Debug::log(LOG, "Ungroupping member non-head window");
+            g_pLayoutManager->getCurrentLayout()->onWindowCreatedTiling(w);
+            // Focus the window that we just spawned, so that on the next iteration
+            // the window created will be it's dwindle child node.
+            // This allows the original group head to remain a parent window to all
+            // of the other (groupped) nodes
+            g_pCompositor->focusWindow(w);
+        }
+    }
+
+    g_pKeybindManager->m_bGroupsLocked = GROUPSLOCKEDPREV;
+
+    g_pCompositor->updateAllWindowsAnimatedDecorationValues();
+
+    // Leave with the focus the original group (head) window
+    g_pCompositor->focusWindow(PWINDOW);
 }
 
 void groupCreate(const SDwindleNodeData* PNODE, CHyprDwindleLayout* layout)
