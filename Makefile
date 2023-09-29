@@ -22,6 +22,7 @@ LINK_FLAGS=-shared
 .PHONY: clean uninstall clangd
 
 all:
+	$(MAKE) clear
 	@if ! pkg-config --exists hyprland; then \
 		echo 'Hyprland headers not available. Run `make pluginenv` in the root Hyprland directory.'; \
 		exit 1; \
@@ -29,16 +30,17 @@ all:
 
 	g++ $(LINK_FLAGS) $(COMPILE_FLAGS) $(COMPILE_DEFINES) $(SOURCE_FILES) -o $(PLUGIN_NAME).so
 
-install: all
+install:
 	$(MAKE) clear
+	$(MAKE) all
 	mkdir -p $(INSTALL_LOCATION)
 	cp $(PLUGIN_NAME).so $(INSTALL_LOCATION)
 
 uninstall:
-	rm -rf $(INSTALL_LOCATION)
+	rm -rf $(INSTALL_LOCATION)/$(PLUGIN_NAME).so
 
-clean:
-	rm ./${PLUGIN_NAME}.so
+clear:
+	rm -f ./$(PLUGIN_NAME).so
 
 clangd:
 	echo "$(COMPILE_FLAGS) $(COMPILE_DEFINES)" | \
