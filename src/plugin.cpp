@@ -160,8 +160,67 @@ void newDestroyGroup(CWindow* self)
         return;
     }
 
-    // TODO: Add proper ungroupping logic instead of this fallback
-    // (Tracked by github issue #1)
-    Debug::log(LOG, "[dwindle-autogroup] Falling back to original ungroupping behavior (temporary)");
-    ((createGroupFuncT)g_pDestroyGroupHook->m_pOriginal)(self);
+    std::deque<CWindow*> dGroupWindows;
+    collectGroupWindows(&dGroupWindows, self);
+
+    // If the group head window is in fullscreen, unfullscreen it.
+    // We need to have the window placed in the layout, to figure out where
+    // to ungroup the rest of the windows.
+    g_pCompositor->setWindowFullscreen(self, false, FULLSCREEN_FULL);
+
+    Debug::log(LOG, "[dwindle-autogroup] Ungroupping {} windows", dGroupWindows.size());
+
+    const bool GROUPS_LOCKED_PREV = g_pKeybindManager->m_bGroupsLocked;
+    g_pKeybindManager->m_bGroupsLocked = true;
+
+    for (auto& pWindow : dGroupWindows) {
+        Debug::log(LOG, "[dwindle-autogroup] Ungroupping window {:x}", pWindow);
+        pWindow->m_sGroupData.pNextWindow = nullptr;
+        pWindow->m_sGroupData.head = false;
+
+        // Current / Visible window (this isn't always the head)
+        if (!pWindow->isHidden()) {
+            Debug::log(LOG, "[dwindle-autogroup] -> Visible window ungroup");
+
+            // This window is already visible in the layout, we don't need to create
+            // a new layout window for it.
+            //
+            // The original destroyGroup removes the window from the layout here,
+            // which is what causes the weird ungroupping behavior as this window
+            // is then recreated, which spawns it in a potentially unexpected place
+            // (often determined by the cursor position).
+
+            // Update the window decorations (removing group bar)
+            pWindow->updateWindowDecos();
+        }
+        else {
+            pWindow->setHidden(false);
+
+            g_pLayoutManager->getCurrentLayout()->onWindowCreatedTiling(pWindow);
+            pWindow->updateWindowDecos();
+
+            // Focus the window that we just spawned, so that on the next iteration
+            // the window created will be it's dwindle child node.
+            // This allows the original group head to remain a parent window to all
+            // of the other (groupped) nodes.
+            //
+            // Note that this won't preserve the exact original layout of the group
+            // but it will make sure all of the groupped windows will extend from
+            // the dwindle node of the group head window. Preserving the original
+            // layout isn't really possible, since new windows can be added into
+            // groups after they were created.
+            g_pCompositor->focusWindow(pWindow);
+        }
+    }
+
+    g_pKeybindManager->m_bGroupsLocked = GROUPS_LOCKED_PREV;
+
+    Debug::log(LOG, "[dwindle-autogroup] All windows ungroupped");
+
+    g_pCompositor->updateAllWindowsAnimatedDecorationValues();
+
+    // Leave with the focus the original (main) window
+    g_pCompositor->focusWindow(self);
+
+    Debug::log(LOG, "[dwindle-autogroup] Ungroupping done");
 }
