@@ -108,9 +108,13 @@ void newCreateGroup(CWindow* self)
 
     // Collect all child dwindle nodes, we'll want to add all of those into a group
     const auto P_DWINDLE_NODE = g_pNodeFromWindow(pDwindleLayout, self);
+    const auto P_PARENT_NODE = P_DWINDLE_NODE->pParent;
+    if (!P_PARENT_NODE) {
+        Debug::log(LOG, "[dwindle-autogroup] Ignoring autogroup for a single window");
+        return;
+    }
+    const auto P_SIBLING_NODE = P_PARENT_NODE->children[0] == P_DWINDLE_NODE ? P_PARENT_NODE->children[1] : P_PARENT_NODE->children[0];
     std::deque<SDwindleNodeData*> p_dDwindleNodes;
-    const auto P_SIBLING_NODE =
-        P_DWINDLE_NODE->pParent->children[0] == P_DWINDLE_NODE ? P_DWINDLE_NODE->pParent->children[1] : P_DWINDLE_NODE->pParent->children[0];
     collectDwindleChildNodes(&p_dDwindleNodes, P_SIBLING_NODE);
 
     // Stop if one of the dwindle child nodes is already in a group
