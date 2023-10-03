@@ -104,7 +104,7 @@ void newCreateGroup(CWindow* self)
     if (!handleGroupOperation(&pDwindleLayout))
         return;
 
-    Debug::log(LOG, "[dwindle-autogroup] Autogroupping dwindle child nodes");
+    Debug::log(LOG, "[dwindle-autogroup] Collecting dwindle child nodes");
 
     // Collect all child dwindle nodes, we'll want to add all of those into a group
     const auto P_DWINDLE_NODE = g_pNodeFromWindow(pDwindleLayout, self);
