@@ -1,0 +1,9 @@
+[repository]
+name = "dwindle-autogroup"
+authors = ["ItsDrike"]
+
+[dwindle-autogroup]
+description = "Automatically group child nodes on group creation in dwindle layout"
+authors = ["ItsDrike"]
+output = "dwindle-autogroup.so"
+build = ["make all"]

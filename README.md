@@ -2,17 +2,25 @@
 
 This plugin changes the behavior of the `togglegroup` dispatcher for dwindle layout, to automatically group all of the child windows when a new group is created.
 
-Before Hyprland `v0.23.0beta`, this was actually the default behavior ([PR #1580](https://github.com/hyprwm/Hyprland/pull/1580)), however as that release introduced group support for other layouts, including floating windows, this dwindle specific feature was removed and `togglegroup` now only creates a group window, and requires you to move in all of the windows that should be a part of that group into it manually.
+> [!IMPORTANT]
+> dwindle-autogroup follows hyprland-git and requires hyprland-git to work properly.
+> If you want to use a versioned hyprland, you'll have to reset hyprland-plugins
+> to a commit from before that hyprland version's release date.
+
+Before Hyprland `v0.23.0beta`, this groupping behavior was actually the default behavior ([PR #1580](https://github.com/hyprwm/Hyprland/pull/1580)), however as that release introduced group support for other layouts, including floating windows, this dwindle specific feature was removed and `togglegroup` now only creates a group window, and requires you to move in all of the windows that should be a part of that group into it manually.
 
 ## Installation
 
-Since Hyprland plugins don't have ABI guarantees, you should download the Hyprland source and compile it if you plan to use plugins. This ensures the compiler version is the same between the Hyprland build you're running, and the plugins you are using.
+### Hyprpm
 
-The guide on compiling and installing Hyprland manually is on the [wiki](http://wiki.hyprland.org/Getting-Started/Installation/#manual-manual-build)
+The recommended way to install this plugin is via `hyprpm`:
 
-Note, this plugin currently requires hyprland compiled from commit: [`4afeedbd`](https://github.com/hyprwm/Hyprland/commit/4afeedbd567ca2114f682f14a6de26d4a8188878) or later.
+- `hyprpm add https://github.com/ItsDrike/hyprland-dwindle-autogroup`
+- `hyprpm enable dwindle-autogroup`
 
-## Using [hyprload](https://github.com/Duckonaut/hyprload)
+To automatically load the plugin when hyprland starts, add `exec-once = hyprpm reload -n` to your hyprland config.
+
+### [Hyprload](https://github.com/Duckonaut/hyprload)
 
 Add the line `"ItsDrike/hyprland-dwindle-autogroup"` to your `hyprload.toml` config, like this:
 
