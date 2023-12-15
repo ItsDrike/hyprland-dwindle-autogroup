@@ -4,7 +4,7 @@ This plugin changes the behavior of the `togglegroup` dispatcher for dwindle lay
 
 > [!IMPORTANT]
 > dwindle-autogroup follows hyprland-git and requires hyprland-git to work properly.
-> If you want to use a versioned hyprland, you'll have to reset hyprland-plugins
+> If you want to use a versioned hyprland, you'll have to reset dwindle-autogroup
 > to a commit from before that hyprland version's release date.
 
 Before Hyprland `v0.23.0beta`, this groupping behavior was actually the default behavior ([PR #1580](https://github.com/hyprwm/Hyprland/pull/1580)), however as that release introduced group support for other layouts, including floating windows, this dwindle specific feature was removed and `togglegroup` now only creates a group window, and requires you to move in all of the windows that should be a part of that group into it manually.
