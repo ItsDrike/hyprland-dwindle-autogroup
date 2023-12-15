@@ -9,6 +9,10 @@ This plugin changes the behavior of the `togglegroup` dispatcher for dwindle lay
 
 Before Hyprland `v0.23.0beta`, this groupping behavior was actually the default behavior ([PR #1580](https://github.com/hyprwm/Hyprland/pull/1580)), however as that release introduced group support for other layouts, including floating windows, this dwindle specific feature was removed and `togglegroup` now only creates a group window, and requires you to move in all of the windows that should be a part of that group into it manually.
 
+# Showcase
+
+https://github.com/ItsDrike/hyprland-dwindle-autogroup/assets/20902250/31e60fcf-b741-4501-b20e-0e2bf0c65209
+
 ## Installation
 
 ### Hyprpm
