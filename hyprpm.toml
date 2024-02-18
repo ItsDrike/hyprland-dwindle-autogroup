@@ -1,6 +1,20 @@
 [repository]
 name = "dwindle-autogroup"
 authors = ["ItsDrike"]
+commit_pins = [
+  [
+    "3bb9c7c5cf4f2ee30bf821501499f2308d616f94",
+    "bcb375d507d417b2695a0d6532990cc25f45bc31",
+  ], # 0.33.0
+  [
+    "03ebbe18ed8517ee22591eac82cd54322f42cb7d",
+    "bcb375d507d417b2695a0d6532990cc25f45bc31",
+  ], # 0.34.0
+  [
+    "84ab8d11e8951a6551d1e1bf87796a8589da6d47",
+    "bcb375d507d417b2695a0d6532990cc25f45bc31",
+  ], # 0.35.0
+]
 
 [dwindle-autogroup]
 description = "Automatically group child nodes on group creation in dwindle layout"
