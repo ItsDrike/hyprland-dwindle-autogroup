@@ -49,7 +49,8 @@ void moveIntoGroup(CWindow* pWindow, CWindow* pGroupHeadWindow)
 {
     const auto P_LAYOUT = g_pLayoutManager->getCurrentLayout();
 
-    const auto* USE_CURR_POS = &g_pConfigManager->getConfigValuePtr("misc:group_insert_after_current")->intValue;
+    const auto* USE_CURR_POS = (Hyprlang::INT* const*)g_pConfigManager->getConfigValuePtr("group:insert_after_current");
+
     CWindow* pGroupWindow = *USE_CURR_POS ? pGroupHeadWindow : pGroupHeadWindow->getGroupTail();
 
     // Remove the window from layout (will become a part of a group)
