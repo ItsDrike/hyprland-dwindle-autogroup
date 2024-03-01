@@ -24,7 +24,7 @@ LINK_FLAGS=-shared
 all:
 	$(MAKE) clear
 	@if ! pkg-config --exists hyprland; then \
-		echo 'Hyprland headers not available. Run `make pluginenv` in the root Hyprland directory.'; \
+		echo 'Hyprland headers not available. Run `make all && sudo make installheaders` in the root Hyprland directory.'; \
 		exit 1; \
 	fi
 
