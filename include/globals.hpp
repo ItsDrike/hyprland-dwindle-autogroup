@@ -1,5 +1,6 @@
 #pragma once
 
+#include <hyprland/src/desktop/DesktopTypes.hpp> // needed for DwindleLayout.hpp
 #include <hyprland/src/layout/DwindleLayout.hpp>
 #include <hyprland/src/plugins/HookSystem.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
