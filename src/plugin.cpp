@@ -97,6 +97,12 @@ void newCreateGroup(CWindow* self)
         return;
     }
 
+    // Skip floating windows
+    if (self->m_bIsFloating) {
+        Debug::log(LOG, "[dwindle-autogroup] Ignoring autogroup for floating window");
+        return;
+    }
+
     Debug::log(LOG, "[dwindle-autogroup] Triggered createGroup for {:x}", self);
 
     // Obtain an instance of the dwindle layout, also run some general pre-conditions
