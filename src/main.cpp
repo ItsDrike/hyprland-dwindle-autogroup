@@ -33,7 +33,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
     Debug::log(LOG, "[dwindle-autogroup] Loading Hyprland functions");
 
     // Find pointers to functions by name (from the Hyprland binary)
-    g_pNodeFromWindow = (nodeFromWindowFuncT)findHyprlandFunction("getNodeFromWindow", "CHyprDwindleLayout::getNodeFromWindow(CWindow*)");
+    g_pNodeFromWindow =
+        (nodeFromWindowFuncT)findHyprlandFunction("getNodeFromWindow", "CHyprDwindleLayout::getNodeFromWindow(std::shared_ptr<CWindow>)");
     auto pCreateGroup = findHyprlandFunction("createGroup", "CWindow::createGroup()");
     auto pDestroyGroup = findHyprlandFunction("destroyGroup", "CWindow::destroyGroup()");
 
