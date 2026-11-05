@@ -1,49 +1,22 @@
-# compile with `make all`
-# make sure you've ran `make pluginenv` in the clonned Hyprland repo
+PLUGIN_NAME := dwindle-autogroup
+SOURCE_FILES := $(wildcard src/*.cpp)
+HEADERS := $(wildcard include/*.hpp)
 
-PLUGIN_NAME=dwindle-autogroup
+CXX ?= g++
+CPPFLAGS += -Iinclude $(shell pkg-config --cflags hyprland luajit)
+CXXFLAGS ?= -O2 -g
+CXXFLAGS += -std=c++23 -fPIC -fno-gnu-unique
+LDLIBS += $(shell pkg-config --libs luajit)
 
-INSTALL_LOCATION=${HOME}/.local/share/hyprload/plugins/bin
+.PHONY: all clean clangd
 
-SOURCE_FILES=$(wildcard src/*.cpp)
+all: $(PLUGIN_NAME).so
 
-# Compiler/Linker flags
+$(PLUGIN_NAME).so: $(SOURCE_FILES) $(HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -shared $(SOURCE_FILES) $(LDLIBS) -o $@
 
-COMPILE_DEFINES=-DWLR_USE_UNSTABLE
-
-COMPILE_FLAGS=-g -fPIC --no-gnu-unique -std=c++23
-COMPILE_FLAGS+=`pkg-config --cflags pixman-1 libdrm hyprland`
-COMPILE_FLAGS+=-Iinclude
-
-LINK_FLAGS=-shared
-
-# Phony targets (i.e. targets that don't actually build anything, and don't track dependencies)
-# These will always be run when called
-.PHONY: clean uninstall clangd
-
-all:
-	$(MAKE) clear
-	@if ! pkg-config --exists hyprland; then \
-		echo 'Hyprland headers not available. Run `make all && sudo make installheaders` in the root Hyprland directory.'; \
-		exit 1; \
-	fi
-
-	g++ $(LINK_FLAGS) $(COMPILE_FLAGS) $(COMPILE_DEFINES) $(SOURCE_FILES) -o $(PLUGIN_NAME).so
-
-install:
-	$(MAKE) all
-	mkdir -p $(INSTALL_LOCATION)
-	cp $(PLUGIN_NAME).so $(INSTALL_LOCATION)
-
-uninstall:
-	rm -rf $(INSTALL_LOCATION)/$(PLUGIN_NAME).so
-
-clear:
-	rm -f ./$(PLUGIN_NAME).so
+clean:
+	rm -f $(PLUGIN_NAME).so
 
 clangd:
-	echo "$(COMPILE_FLAGS) $(COMPILE_DEFINES)" | \
-		sed 's/--no-gnu-unique//g' | \
-		sed 's/ -/\n-/g' | \
-		sed 's/std=c++23/std=c++2b/g' \
-		> compile_flags.txt
+	printf '%s\n' $(CPPFLAGS) $(CXXFLAGS) > compile_flags.txt

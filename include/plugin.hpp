@@ -1,9 +1,5 @@
-#include "globals.hpp"
+#pragma once
 
-/* New custom function replacing the original CWindow::createGroup function
- */
-void newCreateGroup(CWindow*);
+#include <hyprland/src/plugins/PluginAPI.hpp>
 
-/* New custom function replacing the original CWindow::createGroup function
- */
-void newDestroyGroup(CWindow*);
+SDispatchResult toggleAutogroup(const std::string& args);

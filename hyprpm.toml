@@ -2,7 +2,7 @@
 name = "dwindle-autogroup"
 authors = ["ItsDrike"]
 commit_pins = [
-  # [hyprland-commit, plugin-sommit],
+  # [hyprland-commit, plugin-commit],
   ["3bb9c7c5cf4f2ee30bf821501499f2308d616f94", "v0.33.0"], # 0.33.0
   ["03ebbe18ed8517ee22591eac82cd54322f42cb7d", "v0.33.0"], # 0.34.0
   ["84ab8d11e8951a6551d1e1bf87796a8589da6d47", "v0.33.0"], # 0.35.0
@@ -13,6 +13,9 @@ commit_pins = [
   ["360ede79d124ffdeebbe8401f1ac4bc0dbec2c91", "v0.36.0"], # 0.38.1
   ["e93fbd7c4f991cb8ef03e433ccc4d43587923e15", "v0.36.0"], # 0.39.0
   ["fe7b748eb668136dd0558b7c8279bfcd7ab4d759", "v0.36.0"], # 0.39.1
+  # Versions in between 0.39.1 - 0.56.2 are currently unsupported
+  ["0aa6745f705f2c4b0a5004eb019ef76e5bbdb426", "v0.57.0"], # 0.57.0
+  ["acc1aa0bfd4bd575dcb0f76c35ccf12b660a1ab9", "v0.57.0"], # 0.57.1
 ]
 
 [dwindle-autogroup]

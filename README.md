@@ -1,13 +1,17 @@
 # Dwindle-Autogroup
 
-This plugin changes the behavior of the `togglegroup` dispatcher for dwindle layout, to automatically group all of the child windows when a new group is created.
+This plugin adds an alternative to the toggle group dispatcher for dwindle
+layout, to automatically group all of the child windows when a new group is
+created.
 
-> [!IMPORTANT]
-> dwindle-autogroup follows hyprland-git and requires hyprland-git to work properly.
-> If you want to use a versioned hyprland, you'll have to reset dwindle-autogroup
-> to a commit from before that hyprland version's release date.
+Before Hyprland `v0.23.0beta`, this groupping behavior was actually the default
+behavior, however as that release introduced group support for other layouts,
+including floating windows, this dwindle specific feature was removed (in [PR
+#1580][hypr-pr-1580]) and group toggling now only creates a group window, and
+requires you to move in all of the windows that should be a part of that group
+into it manually.
 
-Before Hyprland `v0.23.0beta`, this groupping behavior was actually the default behavior, however as that release introduced group support for other layouts, including floating windows, this dwindle specific feature was removed (in [PR #1580](https://github.com/hyprwm/Hyprland/pull/1580)) and `togglegroup` now only creates a group window, and requires you to move in all of the windows that should be a part of that group into it manually.
+[hypr-pr-1580]: https://github.com/hyprwm/Hyprland/pull/1580
 
 # Showcase
 
@@ -22,35 +26,99 @@ The recommended way to install this plugin is via `hyprpm`:
 - `hyprpm add https://github.com/ItsDrike/hyprland-dwindle-autogroup`
 - `hyprpm enable dwindle-autogroup`
 
-To automatically load the plugin when hyprland starts, add `exec-once = hyprpm reload -n` to your hyprland config.
+Load enabled plugins in the current session with `hyprpm reload`. To load them
+automatically when Hyprland starts, add this to `hyprland.lua`:
 
-### [Hyprload](https://github.com/Duckonaut/hyprload)
-
-Add the line `"ItsDrike/hyprland-dwindle-autogroup"` to your `hyprload.toml` config, like this:
-
-```
-plugins = [
-    "ItsDrike/hyprland-dwindle-autogroup",
-]
+```lua
+hl.on("hyprland.start", function()
+    hl.exec_cmd("hyprpm reload -n")
+end)
 ```
 
-Then update via `hyprload,update` dispatcher.
+The `-n` flag adds a success notification, remove it if you don't like that.
+Run `hyprpm update` after upgrading Hyprland or the plugin. See the [Hyprland
+plugin documentation][hypr-plugin-docs] for more information, including
+permissions if enabled in your configuration.
+
+[hypr-plugin-docs]: https://wiki.hypr.land/Plugins/Using-Plugins/
 
 ## Manual installation
 
-1. Clone the Hyprland repository and build the plugin environment
+1. **Set up the Hyprland headers.** The headers are the Hyprland source files
+   needed to compile the plugin. They must come from the **same Hyprland
+   commit** as the compositor you run: even two builds with the same version
+   number can differ. Check your running version and commit with:
 
-   - `git clone --recursive https://github.com/hyprwm/Hyprland`
-   - In the Hyprland directory: `make pluginenv`
-   - Ideally, you should use this instance of Hyprland as your compositor, to do that, run `make install`. This is heavily recommended, as using a different Hyprland instance might cause incompatibilities.
+   ```sh
+   hyprctl version
+   ```
 
-2. Build the plugn
+   If your distribution provides Hyprland development headers for that exact
+   build, install them using its package manager. You can check whether
+   `pkg-config` finds the headers and their dependencies with:
 
-   - Run `make all`
+   ```sh
+   pkg-config --modversion hyprland
+   pkg-config --cflags hyprland
+   ```
 
-3. Add this line to the bottom of your hyprland config
+   If the headers aren't available as a package, build and install them from
+   Hyprland's source.
 
-   - `exec-once=hyprctl plugin load <ABSOLUTE PATH TO split-monitor-workspaces.so>`
+   ```sh
+   cd /whatever/dir/you/like
+   git clone --recursive https://github.com/hyprwm/Hyprland.git
+   cd Hyprland
+   git checkout "$(hyprctl version -j | jq -r '.commit')"
+   git submodule update --init --recursive
+   make all
+   sudo make installheaders
+   ```
+
+   This requires Hyprland's build dependencies (see [build
+   instructions][hypr-build-instructions]).
+
+2. **Install build dependencies.** Requires LuaJIT development files, `pkg-config`, and a
+   C++23 compiler, as well as any missing Hyprland dependency development
+   packages. Use a compiler and C++ standard library compatible with the ones
+   used to build your running Hyprland.
+
+3. **Build the plugin.** In this plugin's repository, run:
+
+   ```sh
+   make all
+   ```
+
+4. **Load the plugin.** Use the absolute path to the resulting shared object:
+
+   ```sh
+   hyprctl plugin load /absolute/path/to/dwindle-autogroup.so
+   ```
+
+   The plugin checks for a Hyprland version mismatch at load time. Rebuild it
+   with matching headers after updating Hyprland.
+
+[hypr-build-instructions]: https://wiki.hypr.land/Getting-Started/Installation/
+
+## Usage
+
+Add a bind to `hyprland.lua` (instead of the native `hl.dsp.group.toggle()`):
+
+```lua
+hl.bind("SUPER + G", function()
+    local plugin = hl.plugin.dwindle_autogroup
+    if not plugin then return end
+    local ok, err = plugin.toggle()
+    if not ok then
+        hl.notification.create({ text = err, duration = 3000 })
+    end
+end)
+```
+
+The function returns `true` on success or `false, error_message` on failure. It
+works on tiled dwindle windows, refuses groupping if the dwindle subtree
+contain existing groups, and requires exiting fullscreen or maximized mode
+before ungroupping.
 
 ## Development
 
